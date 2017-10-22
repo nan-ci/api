@@ -5,5 +5,9 @@ const create = params => new Promise((s, f) =>
   members.create(params, (e, r) => e ? f(e) : s(r)))
 
 module.exports = {
-  addEmail: (address, subscribed) => create({ address, subscribed }),
+  addEmail: (address, subscribed) => create({
+    vars: { joinedAt: Date.now() },
+    subscribed,
+    address,
+  }),
 }

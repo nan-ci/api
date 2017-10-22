@@ -4,7 +4,7 @@ const mailgun = require('./mailgun')
 // you may not use 'req' as param name
 
 module.exports = {
-  GET: {
+  POST: {
     '/email/': {
       description: 'Add an email to the list',
       params: { email: String, sub: Boolean },
