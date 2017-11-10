@@ -4,7 +4,7 @@ const { required, oneOf, optional, between } = require('4k/route-helper')
 const server = require('4k/server')
 
 const missingEnvKeys = [
-  'MAILGUN_DOMAIN',
+  'DOMAIN',
   'MAILGUN_LIST',
   'MAILGUN_APIKEY',
   'API_PORT',

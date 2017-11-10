@@ -1,5 +1,5 @@
 ### Environement variables
-##### MAILGUN_DOMAIN
+##### DOMAIN
 ##### MAILGUN_LIST
 ##### MAILGUN_APIKEY
 ##### API_PORT
