@@ -1,5 +1,5 @@
-const { request } = require('https')
-const { error: { _403 } } = require('./errors')
+const request = require('4k/request')
+const { _403 } = require('4k/errors')
 
 const isValidDns = (login, name) => name.endsWith(`${login}.nan.ci`)
 const appendLogin = (login, name) => isValidDns(login, name)
@@ -12,7 +12,8 @@ const cfPath = [
   'dns_records',
 ].join('/')
 
-const cf = (method, record, data) => request({
+const cf = (method, record, body) => request({
+  body,
   method,
   host: 'api.cloudflare.com',
   path: cfPath + (record && `/${record}`),
@@ -21,7 +22,7 @@ const cf = (method, record, data) => request({
     'X-Auth-Key': process.env.CLOUDFLARE_APIKEY,
     'Content-Type': 'application/json',
   },
-}, data).then(JSON.parse)
+}).then(JSON.parse)
 
 const create = ({ token, name, ...params }) =>
   cf('POST', '', { name: appendLogin(token, name), ...params })

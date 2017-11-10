@@ -1,12 +1,29 @@
-const gh = (method, token, path, data) => request({
-  headers: { 'User-Agent': 'NaN-App', Authorization: `Token ${token}` },
-  host: 'api.github.com',
-  method,
-  path,
-}).then(JSON.parse)
+const { use, t, post } = require('4k/request')
+const api = require('4k/api')
+const { c, to } = require('4k')
 
-gh.get = (t, p, d) => gh('GET', t, p, d)
+const prepareOpts = c.fast([
+  use({
+    host: 'api.github.com',
+    headers: { 'User-Agent': 'NaN-App' },
+  }),
+  t(opts => opts.headers.Authorization = `token ${opts.token}`),
+])
+
+const v3 = api(prepareOpts)
+const v4 = query => token =>
+  post(prepareOpts({ token, path: '/graphql', body: `{"query": "${query}"}` }))
 
 module.exports = {
-  user: token => gh.get(token, '/user'),
+  v3,
+  v4,
+  login: c([
+    v4('query { viewer { login }}'),
+    to.data.viewer.login,
+  ]),
+  email: c([
+    v3.get.user.emails,
+    c.Array.filter(to.primary),
+    to[0].email,
+  ])
 }
