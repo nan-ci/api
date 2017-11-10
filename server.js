@@ -1,7 +1,6 @@
 const { createServer } = require('http')
 const { c, to } = require('4k')
 const { required, oneOf, optional, between } = require('4k/route-helper')
-const { Server: wsServer, WebSocket: wsSocket } = require('uws')
 const server = require('4k/server')
 
 const missingEnvKeys = [
