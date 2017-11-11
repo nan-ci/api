@@ -36,7 +36,7 @@ const oauth = {
       .then(success => success ? key : oauth.setState(res))
   },
   handler: ({ access_token: token, scope, token_type, state, req }) =>
-    getUserInfo(access_token)
+    getUserInfo(token)
       .then(user => user.email
         ? user
         : (user.email = github.email(token))
