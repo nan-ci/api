@@ -44,7 +44,7 @@ const solve = (level, answer) => {
     }
 
     if (level.stack.length > stackMaxSize) {
-      console.log('stack maximum call reached')
+      console.log('stack max size reached')
       return false
     }
 

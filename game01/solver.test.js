@@ -46,9 +46,10 @@ test('# method: solve', [
   t => t.equal(solve(levels[0], [[FW, FW], [FW]]), false, 'checker: invalid lengths #2'),
   t => t.equal(solve(levels[0], [[FW, TL]]), false, 'checker: invalid instruction'),
   t => t.equal(solve(levels[0], [[FW, 19]]), false, 'checker: invalid instruction #2'),
+  t => t.equal(solve(levels[0], [[F0, NO]]), false, 'error: stack max size reached'),
   t => t.equal(solve(levels[0], [[FW, F0]]), true, 'level1: simple, with repeat function'),
   t => t.equal(solve(levels[0], [[FW, FW]]), false, 'level1: empty stack'),
   t => t.equal(solve(levels[1], [[FW, TL+C2, P1+C2, TL+C3, TL+C3, F0]]), true, 'level2: repeat, conditions, paint'),
-  t => t.equal(solve(levels[1], [[FW, TL, FW, NO, NO, NO]]), false, 'level2: died'),
+  t => t.equal(solve(levels[1], [[FW, TL, FW, NO, NO, NO]]), false, 'level2: player died'),
   t => t.equal(solve(levels[2], [[FW, TL+C2, P1+C2, F1], [TL+C3, TL+C3, F0]]), true, 'level2b: multiple functions'),
 ])
