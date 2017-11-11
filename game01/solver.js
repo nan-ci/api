@@ -3,35 +3,14 @@ const cloneDeep = require('lodash/cloneDeep')
 const level1 = require('./level1')
 const level2 = require('./level2')
 
-const NO = 0
-const FW = 1
-const TL = 2
-const TR = 3
-const P1 = 4
-const P2 = 5
-const P3 = 6
-const F0 = 7
-const F1 = 8
-const F2 = 9
-const C1 = 100
-const C2 = 200
-const C3 = 300
-
-const _instructions = { NO, FW, TL, TR, P1, P2, P3, F0, F1, F2, C1, C2, C3 }
+const {
+  NO, FW, TL, TR, P1, P2, P3, F0, F1, F2, C1, C2, C3,
+  allInstructions,
+  getPossibleInstructions
+} = require('./instructions')
 
 const answer1 = [[FW, F0]]
 const answer2 = [[FW, TL+C2, P1+C2, TL+C3, TL+C3, F0]]
-
-const getPossibleInstructions = instructions => {
-  const basics = instructions.filter(i => i < 100)
-  const conditions = instructions.filter(i => i >= 100)
-
-  return [
-    NO,
-    ...basics,
-    ...conditions.reduce((arr, c) => arr.concat(basics.map(b => c + b)), [])
-  ]
-}
 
 const stackMaxSize = 100
 
@@ -45,7 +24,7 @@ const solve = (level, answer) => {
   }
 
   // verify instructions are valids
-  const activeInstructions = level.activeInstructions.map(k => _instructions[k])
+  const activeInstructions = level.activeInstructions.map(k => allInstructions[k])
   const possibleInstructions = getPossibleInstructions(activeInstructions)
   if (!flatMap(answer).every(v => possibleInstructions.includes(v))) {
     console.log('invalid instructions')
@@ -59,8 +38,6 @@ const solve = (level, answer) => {
 
   // run
   while (level.stars) {
-    console.log('STACK:', level.stack)
-
     if (!level.stack.length) {
       console.log('empty stack')
       return false
@@ -111,8 +88,6 @@ const paint = (level, color) => {
 }
 
 const repeatFunction = (level, id) => {
-  console.log(`Repeat F${id}`)
-
   return {
     ...level,
     stack: [
@@ -186,11 +161,7 @@ const applyInstruction = (level, instruction) => {
   }
 }
 
-console.log(solve(level1, answer1))
-console.log(solve(level2, answer2))
-
 module.exports = {
-  getPossibleInstructions,
   solve,
   applyInstruction,
 }
