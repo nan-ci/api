@@ -17,6 +17,11 @@ const v3 = api(prepareOpts)
 const v4 = query => token =>
   post(prepareOpts({ token, path: '/graphql', body: `{"query": "${query}"}` }))
 
+const getUserInfo = c([
+  github.v4('query { viewer { login, id, email }}'),
+  to.data.viewer,
+])
+
 const DAY = 86400
 const oauth = {
   authorizeUrl: 'https://github.com/login/oauth/authorize',

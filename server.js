@@ -23,11 +23,6 @@ const mailgun = require('./mailgun')
 const github = require('./github')
 const dns = require('./dns')
 
-const getUserInfo = c([
-  github.v4('query { viewer { login, id, email }}'),
-  to.data.viewer,
-])
-
 const routes = {
   OAUTH: {
     github: github.oauth,
@@ -98,7 +93,7 @@ module.exports = createServer(server({
   routes,
   domain: `https://api.${process.env.DOMAIN}`,
   allowOrigin: `https://${process.env.DOMAIN}`,
-  getSession: cookie => db.get(cookie).then(db.get),
+  getSession: c([ db.get, db.get ]),
 })).listen(process.env.API_PORT)
 
 // It return JSON statusCode 200 by default
