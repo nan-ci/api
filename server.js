@@ -2,6 +2,7 @@ const { createServer } = require('http')
 const { c, to } = require('4k')
 const { required, oneOf, optional, between } = require('4k/route-helper')
 const server = require('4k/server')
+const db = require('redis')
 
 const missingEnvKeys = [
   'DOMAIN',
@@ -22,53 +23,39 @@ const mailgun = require('./mailgun')
 const github = require('./github')
 const dns = require('./dns')
 
+const getUserInfo = c([
+  github.v4('query { viewer { login, id, email }}'),
+  to.data.viewer,
+])
+
 const routes = {
   OAUTH: {
-    github: {
-      authorizeUrl: 'https://github.com/login/oauth/authorize',
-      accessUrl: 'https://github.com/login/oauth/access_token',
-      // setState: an optionnal function that set a state
-      // must return a key to said state (ex: redis key)
-      // this key will be recieved in the handler as state
-      handler: ({ access_token, scope, token_type, state, req }) => {
-        // do whatever we want with the token here
-        // then we return the session ID
-
-        return '898abc879'
-      },
-      opts: {
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
-        scope: [
-          'admin:org',
-          'admin:public_key',
-          'admin:repo_hook',
-          'delete_repo',
-          'gist',
-          'public_repo',
-          'user',
-        ].join(' '),
-      },
+    github: github.oauth,
+  },
+  GET: {
+    '/session': {
+      description: 'log user data',
+      handler: ({ session }) => session,
     },
   },
   POST: {
-    '/email/': {
+    '/email': {
       description: 'Add an email to the list',
       noSession: true,
       params: { email: String, sub: Boolean },
       handler: ({ email, sub }) => mailgun.addEmail(email, sub),
     },
-    '/dns/delete/': {
+    '/dns/delete': {
       description: 'Delete DNS record',
       params:  { record: required(String) },
       handler: dns.delete,
     },
-    '/dns/details/': {
+    '/dns/details': {
       description: 'DNS record details',
       params:  { record: required(String) },
       handler: dns.details,
     },
-    '/dns/update/': {
+    '/dns/update': {
       description: 'Update DNS record',
       params:  {
         name: required(String),
@@ -79,7 +66,7 @@ const routes = {
       },
       handler: dns.update,
     },
-    '/dns/create/': {
+    '/dns/create': {
       description: 'Create DNS record',
       params: {
         name: required(String),
@@ -90,7 +77,7 @@ const routes = {
       },
       handler: dns.create,
     },
-    '/dns/list/': {
+    '/dns/list': {
       description: 'List DNS Records',
       params: {
         name: required(String),
@@ -111,9 +98,7 @@ module.exports = createServer(server({
   routes,
   domain: `https://api.${process.env.DOMAIN}`,
   allowOrigin: `https://${process.env.DOMAIN}`,
-  getSession: cookies => {
-    console.log(cookies)
-  },
+  getSession: cookie => db.get(cookie).then(db.get),
 })).listen(process.env.API_PORT)
 
 // It return JSON statusCode 200 by default
