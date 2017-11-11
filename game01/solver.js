@@ -1,16 +1,11 @@
 const flatMap = require('lodash/flatMap')
 const cloneDeep = require('lodash/cloneDeep')
-const level1 = require('./level1')
-const level2 = require('./level2')
 
 const {
   NO, FW, TL, TR, P1, P2, P3, F0, F1, F2, C1, C2, C3,
   allInstructions,
   getPossibleInstructions
 } = require('./instructions')
-
-const answer1 = [[FW, F0]]
-const answer2 = [[FW, TL+C2, P1+C2, TL+C3, TL+C3, F0]]
 
 const stackMaxSize = 100
 

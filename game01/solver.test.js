@@ -34,9 +34,9 @@ test('# method: getPossibleInstructions', [
 const { solve, applyInstruction } = require('./solver')
 
 const levels = [
-  require('./level1'),
-  require('./level2'),
-  require('./level2b'),
+  require('./levels/level1'),
+  require('./levels/level2'),
+  require('./levels/level2b'),
 ]
 
 // test applyInstruction
