@@ -34,6 +34,19 @@ const routes = {
     },
   },
   POST: {
+    '/session': { // TODO: rm
+      description: 'create a session (used for debug)',
+      params: { session: String, login: String, id: String, email: String, token: String },
+      handler: ({ session, login, id, email, token }) => Promise.all([
+        db.set(session, id),
+        db.set(id, JSON.stringify({ login, id, email, token })),
+      ]).then(() => res => {
+        const cookie = require('cookie')
+        res.setHeader('Set-Cookie',
+          cookie.serialize('4k', session,  { path: '/', maxAge: 60*60*24*7 }))
+        res.end('"OK"')
+      }),
+    },
     '/email': {
       description: 'Add an email to the list',
       noSession: true,
