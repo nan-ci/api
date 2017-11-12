@@ -112,7 +112,9 @@ module.exports = createServer(server({
     get: c([ log, db.get, log, db.get, log, JSON.parse ]),
     redirect: 'https://api.nan.ci/session',
   },
-})).listen(process.env.API_PORT)
+})).listen(process.env.API_PORT, () => {
+  console.info(`server started: http://localhost:${process.env.API_PORT}`)
+})
 
 // It return JSON statusCode 200 by default
 // If you want to handle the answer yourself, you must resolve to a function
