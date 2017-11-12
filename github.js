@@ -35,20 +35,20 @@ const oauth = {
     return db.set(key, '', 'NX', 'EX', DAY)
       .then(success => success ? key : oauth.setState(res))
   },
-  handler: ({ access_token: token, scope, token_type, state, req }) =>
-    getUserInfo(token)
+  handler: ({ access_token: token, scope, token_type, state, error, req }) =>
+    error ? Promise.reject(Error(error)) : getUserInfo(token)
       .then(user => user.email
         ? user
         : (user.email = github.email(token))
           .then(() => user))
       .then(user => {
-        Object.assign(user, { token, id: user.id.toString(36) })
+        Object.assign(user, { token })
         return Promise.all([
-          db.setex(state, user.id, 14 * DAY),
-          db.set(user.id, JSON.stringify(user)),
+          db.setex(state, 14 * DAY, user.id),
+          db.setnx(user.id, JSON.stringify(user)),
         ])
       })
-      .then(() => state),
+      .then(() => state, err => (console.log(err), err)),
   opts: {
     client_id: process.env.GITHUB_CLIENT_ID,
     client_secret: process.env.GITHUB_CLIENT_SECRET,

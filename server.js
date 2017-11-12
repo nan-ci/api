@@ -2,7 +2,7 @@ const { createServer } = require('http')
 const { c, to } = require('4k')
 const { required, oneOf, optional, between } = require('4k/route-helper')
 const server = require('4k/server')
-const db = require('redis')
+const db = require('./redis')
 
 const missingEnvKeys = [
   'DOMAIN',
@@ -89,11 +89,16 @@ const routes = {
   },
 }
 
+const log = _ => (console.log(_), _)
 module.exports = createServer(server({
   routes,
   domain: `https://api.${process.env.DOMAIN}`,
   allowOrigin: `https://${process.env.DOMAIN}`,
-  getSession: c([ db.get, db.get ]),
+  session: {
+    options: { domain: 'api.nan.ci', path: '/' },
+    get: c([ log, db.get, log, db.get, log, JSON.parse ]),
+    redirect: 'https://api.nan.ci/session',
+  },
 })).listen(process.env.API_PORT)
 
 // It return JSON statusCode 200 by default
