@@ -23,8 +23,7 @@ const levels = [
 const formatUserKey = userId => `game01:user:${userId}`
 
 const start = ({ session }) => new Promise(s => {
-  const userId = session.id
-  const key = formatUserKey(userId)
+  const key = formatUserKey(session.id)
 
   db.exists(key)
     .then(exists => {
@@ -55,8 +54,25 @@ const nextLevel = userId => new Promise((s, f) => {
       .catch(err => f(err))
 })
 
-const next = ({ answer, session }) =>
-  solve(level, answer) && nextLevel(session.id)
+const next = ({ answer, session }) => new Promise ((s, f) => {
+  const key = formatUserKey(session.id)
+
+  db.get(key)
+    .then(JSON.parse)
+      .then(user => {
+        const currentLevel = levels[user.currentLevelId]
+
+        if (solve(currentLevel, answer)) {
+          const nextLevelId = ++user.currentLevelId
+
+          db.set(key, JSON.stringify(user))
+          s(levels[nextLevelId])
+        } else {
+          f('invalid answer')
+        }
+      })
+      .catch(err => f(err))
+}
 
 module.exports = {
   start,
