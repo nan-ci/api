@@ -34,11 +34,16 @@ tape('# method: start', t => {
     .catch(t.fail)
 })
 
-test('# redis should close', t => db.quit().then(t.pass, t.fail))
+test('# method: next', [
+  t => start({ session })
+    .then(() => next({ answer: [[FW, FW]], session }))
+    .catch(err => t.equal(err.message, 'invalid answer', 'invalid answer should throw'))
+    .then(() => db.del(key)),
 
-// test('# method: nextLevel', [
-//   t => start({ session })
-//     .then(() => nextLevel(session.id))
-//     .then(lvl => t.deepEqual(lvl, levels[1], `level returned should be the next one`), t.fail)
-//     .then(() => db.del(key))
-// ])
+  t => start({ session })
+    .then(() => next({ answer: [[FW, F0]], session }))
+    .then(lvl => t.deepEqual(lvl, levels[1], `level returned should be the next one`))
+    .then(() => db.del(key)),
+])
+
+test('# redis should close', t => db.quit().then(t.pass, t.fail))
