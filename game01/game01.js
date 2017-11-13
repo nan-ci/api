@@ -50,6 +50,8 @@ const next = ({ answer, session }) => {
 
       if (!solve(currentLevel, answer)) throw Error('invalid answer')
 
+      user.currentLevelId += 1
+
       return db.set(key, JSON.stringify(user))
         .then(() => levels[user.currentLevelId])
     })
