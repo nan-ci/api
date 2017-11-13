@@ -24,7 +24,7 @@ const github = require('./github')
 const dns = require('./dns')
 const game01 = require('./game01')
 
-const ArrayOfArray = value => {
+const isArrayOfArray = value => {
   if (!Array.isArray(value) || !value.every(Array.isArray)) {
     throw Error("Array of Array expected")
   }
@@ -62,7 +62,7 @@ const routes = {
     },
     '/game01/next': {
       description: 'Submit game01 answer & ask for next level',
-      params: { answer: ArrayOfArray },
+      params: { answer: isArrayOfArray },
       handler: game01.next,
     },
     '/email': {

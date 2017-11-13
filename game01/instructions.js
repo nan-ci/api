@@ -14,23 +14,23 @@ const C3 = 300
 
 const allInstructions = { NO, FW, TL, TR, P1, P2, P3, F0, F1, F2, C1, C2, C3 }
 
-const getPossibleInstructions = instructions => {
-  let _instructions = [...instructions]
+const replaceKeyInstructions = key => typeof key === 'string'
+  ? allInstructions[key]
+  : key
 
-  if (_instructions.every(i => typeof i === 'string')) {
-    _instructions = _instructions.map(k => allInstructions[k])
-  }
+const isBasic = c => c < C1
 
-  const basics = _instructions.filter(i => i < 100)
-  const conditions = _instructions.filter(i => i >= 100)
+const addAllPossibles = (arr, c, i, instructions) => {
+  arr.push(c)
 
-  return [
-    NO,
-    ...basics,
-    ...conditions,
-    ...conditions.reduce((arr, c) => arr.concat(basics.map(b => c + b)), [])
-  ]
+  return isBasic(c)
+    ? arr
+    : arr.concat(instructions.filter(isBasic).map(b => c + b))
 }
+
+const getPossibleInstructions = instructions => instructions
+  .map(replaceKeyInstructions)
+  .reduce(addAllPossibles, [ NO ])
 
 module.exports = {
   ...allInstructions,

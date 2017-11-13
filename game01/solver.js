@@ -10,7 +10,7 @@ const {
 const stackMaxSize = 100
 
 const solve = (level, answer) => {
-
+  level = cloneDeep(level)
   // verify lengths
   if (answer.length !== level.functions.length
     || !answer.every((f, i) => f.length === level.functions[i].length)) {
@@ -19,8 +19,7 @@ const solve = (level, answer) => {
   }
 
   // verify instructions are valids
-  const activeInstructions = level.activeInstructions.map(k => allInstructions[k])
-  const possibleInstructions = getPossibleInstructions(activeInstructions)
+  const possibleInstructions = getPossibleInstructions(level.activeInstructions)
   if (!flatMap(answer).every(v => possibleInstructions.includes(v))) {
     console.log('invalid instructions')
     return false
@@ -59,7 +58,7 @@ const solve = (level, answer) => {
       continue // skip
     }
 
-    level = applyInstruction(level, instruction)
+    applyInstruction(level, instruction)
   }
 
   return true
@@ -71,38 +70,25 @@ const isPlayerOutOfBounds = p => p.x < 0 || p.x > 9 || p.y < 0 || p.y > 9
 const isPlayerDead = (p, board) => isPlayerOutOfBounds(p) || !board[p.y][p.x]
 
 const paint = (level, color) => {
-  const board = cloneDeep(level.board)
+  const board = level.board
   const p = level.player
   const currentColor = board[p.y][p.x] % 4
   board[p.y][p.x] = board[p.y][p.x] - currentColor + color
-
-  return {
-    ...level,
-    board
-  }
 }
 
-const repeatFunction = (level, id) => {
-  return {
-    ...level,
-    stack: [
-      ...level.answer[id],
-      ...level.stack
-    ]
-  }
-}
+const repeatFunction = (level, id) =>
+  level.stack = level.answer[id].concat(level.stack)
 
 // should not mutate level & return a new level state
 const applyInstruction = (level, instruction) => {
   switch (instruction) {
-    case NO: return level
+    case NO: return
 
     case FW: {
-      let board = level.board
-      let stars = level.stars
+      const board = level.board
 
       // move
-      const p = { ...level.player }
+      const p = level.player
       if (p.direction === 0) { p.x -= 1 }
       if (p.direction === 1) { p.y -= 1 }
       if (p.direction === 2) { p.x += 1 }
@@ -110,38 +96,21 @@ const applyInstruction = (level, instruction) => {
 
       // check for star
       if (!isPlayerDead(p, board) && hasStar(board[p.y][p.x])) {
-        board = cloneDeep(board)
         board[p.y][p.x] = pickupStar(board[p.y][p.x])
-        stars -= 1
+        level.stars -= 1
       }
 
-      return {
-        ...level,
-        board,
-        player: p,
-        stars
-      }
-
+      return
     }
 
     case TL: {
-      return {
-        ...level,
-        player: {
-          ...level.player,
-          direction: (level.player.direction + 3) % 4
-        }
-      }
+      level.player.direction = (level.player.direction + 3) % 4
+      return
     }
 
     case TR: {
-      return {
-        ...level,
-        player: {
-          ...level.player,
-          direction: (level.player.direction + 1) % 4
-        }
-      }
+      level.player.direction = (level.player.direction + 1) % 4
+      return
     }
 
     case P1: return paint(level, 1)
@@ -152,7 +121,7 @@ const applyInstruction = (level, instruction) => {
     case F1: return repeatFunction(level, 1)
     case F2: return repeatFunction(level, 2)
 
-    default: return level
+    default: return
   }
 }
 

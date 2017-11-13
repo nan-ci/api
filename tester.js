@@ -6,5 +6,3 @@ module.exports = (message, _t, timeout = 1000) =>
     t.plan(tests.length)
     tests.forEach(tt => tt(t))
   })
-
-module.exports.tape = tape

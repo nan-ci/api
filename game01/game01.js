@@ -22,61 +22,41 @@ const levels = [
 
 const formatUserKey = userId => `game01:user:${userId}`
 
-const start = ({ session }) => new Promise(s => {
+const getUser = key => db.get(key)
+  .then(JSON.parse)
+
+const start = ({ session }) => {
   const key = formatUserKey(session.id)
 
-  db.exists(key)
+  return db.exists(key)
     .then(exists => {
       if (exists) {
-        db.get(key)
-          .then(JSON.parse)
-            .then(user => s(levels[user.currentLevelId]))
-      } else {
-        const newUser = { currentLevelId: 0 }
-
-        db.set(key, JSON.stringify(newUser))
-        s(levels[0])
+        return getUser(key)
+          .then(user => levels[user.currentLevelId])
       }
+      const newUser = { currentLevelId: 0 }
+
+      return db.set(key, JSON.stringify(newUser))
+        .then(() => levels[0])
     })
-})
+}
 
-const nextLevel = userId => new Promise((s, f) => {
-  const key = formatUserKey(userId)
-
-  db.get(key)
-    .then(JSON.parse)
-      .then(user => {
-        const nextLevelId = ++user.currentLevelId
-
-        db.set(key, JSON.stringify(user))
-        s(levels[nextLevelId])
-      })
-      .catch(err => f(err))
-})
-
-const next = ({ answer, session }) => new Promise ((s, f) => {
+const next = ({ answer, session }) => {
   const key = formatUserKey(session.id)
 
-  db.get(key)
-    .then(JSON.parse)
-      .then(user => {
-        const currentLevel = levels[user.currentLevelId]
+  return getUser(key)
+    .then(user => {
+      const currentLevel = levels[user.currentLevelId]
 
-        if (solve(currentLevel, answer)) {
-          const nextLevelId = ++user.currentLevelId
+      if (!solve(currentLevel, answer)) throw Error('invalid answer')
 
-          db.set(key, JSON.stringify(user))
-          s(levels[nextLevelId])
-        } else {
-          f('invalid answer')
-        }
-      })
-      .catch(err => f(err))
+      return db.set(key, JSON.stringify(user))
+        .then(() => levels[user.currentLevelId])
+    })
 }
 
 module.exports = {
   start,
   next,
-  nextLevel,
   formatUserKey,
 }
