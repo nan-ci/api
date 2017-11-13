@@ -43,13 +43,9 @@ test('# method: start - step 4', [
     .then(reply => t.equal(reply, 1, `redis entry [${key}] should be deleted`))
 ])
 
-
-test('# method: nextLevel - step 0', [
+test('# method: nextLevel', [
   t => start({session})
-    .then(lvl => t.deepEqual(lvl, levels[0], `init gamel`), t.fail)
-])
-
-test('# method: nextLevel - step 1', [
-  t => nextLevel(session.id)
-    .then(lvl => t.deepEqual(lvl, levels[1], `next level returned should be 2nd level`), t.fail)
+    .then(() => nextLevel(session.id))
+      .then(lvl => t.deepEqual(lvl, levels[1], `level returned should be the next one`), t.fail)
+        .then(() => db.del(key))
 ])
