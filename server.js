@@ -109,7 +109,7 @@ module.exports = createServer(server({
   allowOrigin: `https://${process.env.DOMAIN}`,
   session: {
     options: { domain: 'api.nan.ci', path: '/' },
-    get: c([ log, db.get, log, db.get, log, JSON.parse ]),
+    get: required(c([ db.get, db.get, JSON.parse ])),
     redirect: 'https://api.nan.ci/session',
   },
 })).listen(process.env.API_PORT, () => {
