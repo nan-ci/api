@@ -22,7 +22,7 @@ if (missingEnvKeys.length) {
 const mailgun = require('./mailgun')
 const github = require('./github')
 const dns = require('./dns')
-const game01 = require('./game01')
+const game01 = require('./game01/game01')
 
 const isArrayOfArray = value => {
   if (!Array.isArray(value) || !value.every(Array.isArray)) {
@@ -40,6 +40,10 @@ const routes = {
       description: 'log user data',
       handler: ({ session }) => session,
     },
+    '/game01/start': {
+      description: 'Init game session & return initial (or current) level data',
+      handler: game01.start,
+    },
   },
   POST: {
     '/session': { // TODO: rm
@@ -55,13 +59,8 @@ const routes = {
         res.end('"OK"')
       }),
     },
-    '/game01/start': {
-      description: 'Init game & ask for initial/current level',
-      params: {},
-      handler: game01.start,
-    },
     '/game01/next': {
-      description: 'Submit game01 answer & ask for next level',
+      description: 'Submit answer & return next level data',
       params: { answer: isArrayOfArray },
       handler: game01.next,
     },
