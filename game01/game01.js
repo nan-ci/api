@@ -25,6 +25,11 @@ const formatUserKey = userId => `game01:user:${userId}`
 const getUser = key => db.get(key)
   .then(JSON.parse)
 
+const newUser = id => ({
+  id,
+  currentLevelId: 0,
+})
+
 const start = ({ session }) => {
   const key = formatUserKey(session.id)
 
@@ -34,9 +39,10 @@ const start = ({ session }) => {
         return getUser(key)
           .then(user => levels[user.currentLevelId])
       }
-      const newUser = { currentLevelId: 0 }
 
-      return db.set(key, JSON.stringify(newUser))
+      const user = newUser(session.id)
+
+      return db.set(key, JSON.stringify(user))
         .then(() => levels[0])
     })
 }
@@ -46,6 +52,8 @@ const next = ({ answer, session }) => {
 
   return getUser(key)
     .then(user => {
+      if (!user) throw Error('uninitialized game') // fallback to 'start' ?
+
       const currentLevel = levels[user.currentLevelId]
 
       if (!solve(currentLevel, answer)) throw Error('invalid answer')

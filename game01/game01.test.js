@@ -35,6 +35,9 @@ tape('# method: start', t => {
 })
 
 test('# method: next', [
+  t => next({ answer: [[FW, F0]], session })
+    .catch(err => t.equal(err.message, 'uninitialized game', 'uninitialized game should throw')),
+
   t => start({ session })
     .then(() => next({ answer: [[FW, FW]], session }))
     .catch(err => t.equal(err.message, 'invalid answer', 'invalid answer should throw'))
