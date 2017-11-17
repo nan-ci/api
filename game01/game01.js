@@ -22,6 +22,8 @@ const newUser = id => ({
 const hasGameExpired = user => Date.now() - user.started > gameDurationLimit
 
 const start = ({ session }) => {
+  if (!session || !session.id) throw Error(errors.unknownGameSession)
+
   const key = formatUserKey(session.id)
 
   return getUser(key)
@@ -35,9 +37,12 @@ const start = ({ session }) => {
 
       return levels[user.currentLevelId]
     })
+    .catch(error => throw error)
 }
 
 const next = ({ answer, session }) => {
+  if (!session || !session.id) throw Error(errors.unknownGameSession)
+
   const key = formatUserKey(session.id)
 
   return getUser(key)
@@ -55,6 +60,7 @@ const next = ({ answer, session }) => {
       return db.set(key, JSON.stringify(user))
         .then(() => levels[user.currentLevelId])
     })
+    .catch(error => throw error)
 }
 
 module.exports = {
