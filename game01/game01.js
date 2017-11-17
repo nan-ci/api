@@ -1,6 +1,6 @@
 const db = require('../redis')
 const { solve } = require('./solver')
-const { gameDurationLimit } = require('./constants')
+const { gameDurationLimit, errors } = require('./constants')
 
 const levels = [
   require('./levels/level1'),
@@ -31,7 +31,7 @@ const start = ({ session }) => {
           .then(() => levels[0])
       }
 
-      if (hasGameExpired(user)) throw Error('game is finished')
+      if (hasGameExpired(user)) throw Error(errors.expiredGameSession)
 
       return levels[user.currentLevelId]
     })
@@ -42,13 +42,13 @@ const next = ({ answer, session }) => {
 
   return getUser(key)
     .then(user => {
-      if (!user) throw Error('uninitialized game')
+      if (!user) throw Error(errors.unknownGameSession)
 
-      if (hasGameExpired(user)) throw Error('game is finished')
+      if (hasGameExpired(user)) throw Error(errors.expiredGameSession)
 
       const currentLevel = levels[user.currentLevelId]
 
-      if (!solve(currentLevel, answer)) throw Error('invalid answer')
+      if (!solve(currentLevel, answer)) throw Error(errors.invalidAnswer)
 
       user.currentLevelId += 1
 

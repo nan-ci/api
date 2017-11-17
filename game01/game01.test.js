@@ -1,6 +1,7 @@
 const test = require('../tester')
 const tape = require('tape')
 const { start, next, formatUserKey } = require('./game01')
+const { errors } = require('./constants')
 
 const {
   NO, FW, TL, TR, P1, P2, P3, F0, F1, F2, C1, C2, C3,
@@ -36,11 +37,11 @@ tape('# method: start', t => {
 
 test('# method: next', [
   t => next({ answer: [[FW, F0]], session })
-    .catch(err => t.equal(err.message, 'uninitialized game', 'uninitialized game should throw')),
+    .catch(err => t.equal(err.message, errors.unknownGameSession, 'uninitialized game should throw')),
 
   t => start({ session })
     .then(() => next({ answer: [[FW, FW]], session }))
-    .catch(err => t.equal(err.message, 'invalid answer', 'invalid answer should throw'))
+    .catch(err => t.equal(err.message, errors.invalidAnswer, 'invalid answer should throw'))
     .then(() => db.del(key)),
 
   t => start({ session })

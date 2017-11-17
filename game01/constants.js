@@ -6,6 +6,12 @@ const day = 24 * hour
 
 const gameDurationLimit = 20 * second
 
+const errors = {
+  expiredGameSession: 'this game session has expired',
+  unknownGameSession: 'this game session has ended or doesn\'t exists',
+  invalidAnswer: 'this answer is invalid',
+}
+
 module.exports = {
   time: {
     ms,
@@ -15,4 +21,5 @@ module.exports = {
     day,
   },
   gameDurationLimit,
+  errors,
 }
