@@ -22,7 +22,7 @@ const newUser = id => ({
 const hasGameExpired = user => Date.now() - user.started > gameDurationLimit
 
 const start = ({ session }) => {
-  if (!session || !session.id) throw Error(errors.unknownGameSession)
+  if (!session || !session.id) return Error(errors.unknownGameSession)
 
   const key = formatUserKey(session.id)
 
@@ -41,7 +41,7 @@ const start = ({ session }) => {
 }
 
 const next = ({ answer, session }) => {
-  if (!session || !session.id) throw Error(errors.unknownGameSession)
+  if (!session || !session.id) return Error(errors.unknownGameSession)
 
   const key = formatUserKey(session.id)
 
