@@ -4,7 +4,7 @@ const minute = 60 * second
 const hour = 60 * minute
 const day = 24 * hour
 
-const gameDurationLimit = 20 * second
+const gameDurationLimit = 2 * hour
 
 const errors = {
   expiredGameSession: 'this game session has expired',
