@@ -37,7 +37,7 @@ const start = ({ session }) => {
 
       return levels[user.currentLevelId]
     })
-    .catch(error => throw error)
+    .catch(error => { throw error })
 }
 
 const next = ({ answer, session }) => {
@@ -60,7 +60,7 @@ const next = ({ answer, session }) => {
       return db.set(key, JSON.stringify(user))
         .then(() => levels[user.currentLevelId])
     })
-    .catch(error => throw error)
+    .catch(error => { throw error })
 }
 
 module.exports = {
