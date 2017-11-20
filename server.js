@@ -22,6 +22,14 @@ if (missingEnvKeys.length) {
 const mailgun = require('./mailgun')
 const github = require('./github')
 const dns = require('./dns')
+const game01 = require('./game01/game01')
+
+const isArrayOfArray = value => {
+  if (!Array.isArray(value) || !value.every(Array.isArray)) {
+    throw Error("Array of Array expected")
+  }
+  return value
+}
 
 const routes = {
   OAUTH: {
@@ -31,6 +39,10 @@ const routes = {
     '/session': {
       description: 'log user data',
       handler: ({ session }) => session,
+    },
+    '/game01/start': {
+      description: 'Init game session & return initial (or current) level data',
+      handler: game01.start,
     },
   },
   POST: {
@@ -46,6 +58,11 @@ const routes = {
           cookie.serialize('4k', session,  { path: '/', maxAge: 60*60*24*7 }))
         res.end('"OK"')
       }),
+    },
+    '/game01/next': {
+      description: 'Submit answer & return next level data',
+      params: { answer: isArrayOfArray },
+      handler: game01.next,
     },
     '/email': {
       description: 'Add an email to the list',
