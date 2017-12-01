@@ -1,10 +1,17 @@
+const betaLevels = [
+  require('./levels/00'),
+  require('./levels/01'),
+  require('./levels/02'),
+  require('./levels/03'),
+]
+
 const ms = 1
 const second = 1000 * ms
 const minute = 60 * second
 const hour = 60 * minute
 const day = 24 * hour
 
-const gameDurationLimit = 2 * hour
+const gameDurationLimit = 1 * hour // 2 * hours
 
 const errors = {
   expiredGameSession: 'this game session has expired',
@@ -13,6 +20,7 @@ const errors = {
 }
 
 module.exports = {
+  levels: betaLevels,
   time: {
     ms,
     second,

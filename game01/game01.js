@@ -1,12 +1,6 @@
 const db = require('../redis')
 const { solve } = require('./solver')
-const { gameDurationLimit, errors } = require('./constants')
-
-const levels = [
-  require('./levels/level1'),
-  require('./levels/level2'),
-  require('./levels/level2b'),
-]
+const { levels, gameDurationLimit, errors } = require('./constants')
 
 const formatUserKey = userId => `game01:user:${userId}`
 
