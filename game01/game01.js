@@ -29,7 +29,7 @@ const start = ({ session }) => {
 
       if (hasGameExpired(user)) throw Error(errors.expiredGameSession)
 
-      return levels[user.currentLevelId]
+      return levels[user.currentLevelId] || { done: true }
     })
     .catch(error => { throw error })
 }
@@ -52,7 +52,7 @@ const next = ({ answer, session }) => {
       user.currentLevelId += 1
 
       return db.set(key, JSON.stringify(user))
-        .then(() => levels[user.currentLevelId])
+        .then(() => levels[user.currentLevelId] || { done: true } )
     })
     .catch(error => { throw error })
 }
