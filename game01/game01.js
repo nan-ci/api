@@ -1,6 +1,6 @@
 const db = require('../redis')
 const { solve } = require('./solver')
-const { levels, gameDurationLimit, errors } = require('./constants')
+const { levels, gameDuration, errors } = require('./constants')
 
 const formatUserKey = userId => `game01:user:${userId}`
 
@@ -10,10 +10,21 @@ const getUser = key => db.get(key)
 const newUser = id => ({
   id,
   currentLevelId: 0,
-  started: Date.now(),
+  startedAt: Date.now(),
 })
 
-const hasGameExpired = user => Date.now() - user.started > gameDurationLimit
+const hasGameExpired = user => Date.now() - user.startedAt > gameDuration
+
+const prepareResponse = (user, level) => {
+  const done = level === undefined
+
+  return {
+    level,
+    done,
+    startedAt: user.startedAt,
+    duration: gameDuration
+  }
+}
 
 const start = ({ session }) => {
   if (!session || !session.id) return Error(errors.unknownGameSession)
@@ -23,13 +34,17 @@ const start = ({ session }) => {
   return getUser(key)
     .then(user => {
       if (!user) {
-        return db.set(key, JSON.stringify(newUser(session.id)))
-          .then(() => levels[0])
+        user = newUser(session.id)
+
+        return db.set(key, JSON.stringify(user))
+          .then(() => prepareResponse(user, levels[0]))
       }
 
       if (hasGameExpired(user)) throw Error(errors.expiredGameSession)
 
-      return levels[user.currentLevelId] || { done: true }
+      const level = levels[user.currentLevelId]
+
+      return prepareResponse(user, level)
     })
     .catch(error => { throw error })
 }
@@ -52,7 +67,11 @@ const next = ({ answer, session }) => {
       user.currentLevelId += 1
 
       return db.set(key, JSON.stringify(user))
-        .then(() => levels[user.currentLevelId] || { done: true } )
+        .then(() => {
+          const level = levels[user.currentLevelId]
+
+          return prepareResponse(user, level)
+        })
     })
     .catch(error => { throw error })
 }

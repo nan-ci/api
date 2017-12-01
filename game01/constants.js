@@ -1,9 +1,9 @@
-const betaLevels = [
+const levels = [
   require('./levels/00'),
   require('./levels/01'),
   require('./levels/02'),
   require('./levels/03'),
-]
+] /*BETA*/
 
 const ms = 1
 const second = 1000 * ms
@@ -20,7 +20,7 @@ const errors = {
 }
 
 module.exports = {
-  levels: betaLevels,
+  levels,
   time: {
     ms,
     second,
@@ -28,6 +28,6 @@ module.exports = {
     hour,
     day,
   },
-  gameDurationLimit,
+  gameDuration,
   errors,
 }
