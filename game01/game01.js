@@ -18,6 +18,7 @@ const newUser = id => {
     id,
     currentLevelId: 0,
     startedAt: now,
+    gameDuration,
     levels: [
       { id: 0, startedAt: now }
     ]
@@ -38,7 +39,6 @@ const updateUser = (_user, answer) => {
 
   return user
 }
-
 
 const prepareResponse = (user, level) => {
   const done = level === undefined
