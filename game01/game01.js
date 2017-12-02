@@ -1,19 +1,44 @@
+const cloneDeep = require('lodash/cloneDeep')
 const db = require('../redis')
 const { solve } = require('./solver')
 const { levels, gameDuration, errors } = require('./constants')
 
+
 const formatUserKey = userId => `game01:user:${userId}`
+
+const hasGameExpired = user => Date.now() - user.startedAt > gameDuration
 
 const getUser = key => db.get(key)
   .then(JSON.parse)
 
-const newUser = id => ({
-  id,
-  currentLevelId: 0,
-  startedAt: Date.now(),
-})
+const newUser = id => {
+  const now = Date.now()
 
-const hasGameExpired = user => Date.now() - user.startedAt > gameDuration
+  return {
+    id,
+    currentLevelId: 0,
+    startedAt: now,
+    levels: [
+      { id: 0, startedAt: now }
+    ]
+  }
+}
+
+const updateUser = (_user, answer) => {
+  const user = cloneDeep(_user)
+  const now = Date.now()
+
+  user.levels[user.currentLevelId] = {
+    ...user.levels[user.currentLevelId],
+    endedAt: now,
+    answer
+  }
+  user.currentLevelId += 1
+  user.levels.push({ id: user.currentLevelId, startedAt: now })
+
+  return user
+}
+
 
 const prepareResponse = (user, level) => {
   const done = level === undefined
@@ -64,7 +89,7 @@ const next = ({ answer, session }) => {
 
       if (!solve(currentLevel, answer)) throw Error(errors.invalidAnswer)
 
-      user.currentLevelId += 1
+      user = updateUser(user, answer)
 
       return db.set(key, JSON.stringify(user))
         .then(() => {
