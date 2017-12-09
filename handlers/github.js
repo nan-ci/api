@@ -1,9 +1,8 @@
 const { use, t, post } = require('4k/request')
 const { randomBytes } = require('crypto')
-
 const { c, to } = require('4k')
 const api = require('4k/api')
-const db = require('./redis')
+const db = require('../redis')
 
 const prepareOpts = c.fast([
   use({
