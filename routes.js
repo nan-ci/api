@@ -57,7 +57,7 @@ module.exports = {
     '/users/locations': {
       description: 'Set a user location',
       noSession: true, // should be authenticated
-      params: { user: required(String), location: required(String) },
+      params: { login: required(String), location: required(String) },
       handler: users.setLocation,
     },
     '/server/alive': {
