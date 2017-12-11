@@ -16,7 +16,8 @@
     "body": "^5.1.0",
     "lodash": "^4.17.4",
     "mailgun-js": "^0.13.1",
-    "redis": "^2.8.0"
+    "redis": "^2.8.0",
+    "ws": "^3.3.2"
   },
   "devDependencies": {
     "tap-difflet": "^0.7.0",

@@ -1,7 +1,8 @@
 const { createServer } = require('http')
 const { c, to } = require('4k')
 const { required } = require('4k/route-helper')
-const server = require('4k/server')
+const server4k = require('4k/server')
+const ws = require('./ws')
 const db = require('./redis')
 const routes = require('./routes')
 
@@ -21,7 +22,7 @@ if (missingEnvKeys.length) {
 }
 
 const log = _ => (console.log(_), _)
-module.exports = createServer(server({
+const server = createServer(server4k({
   routes,
   domain: `https://api.${process.env.DOMAIN}`,
   allowOrigin: `https://${process.env.DOMAIN}`,
@@ -33,6 +34,10 @@ module.exports = createServer(server({
 })).listen(process.env.API_PORT, () => {
   console.info(`server started: http://localhost:${process.env.API_PORT}`)
 })
+
+ws.init(server)
+
+module.exports = server
 
 // It return JSON statusCode 200 by default
 // If you want to handle the answer yourself, you must resolve to a function
