@@ -27,9 +27,8 @@ const server = createServer(server4k({
   domain: `https://api.${process.env.DOMAIN}`,
   allowOrigin: `https://${process.env.DOMAIN}`,
   session: {
-    options: { domain: 'api.nan.ci', path: '/' },
+    options: { domain: `api.${process.env.DOMAIN}`, path: '/' },
     get: required(c([ db.get, db.get, JSON.parse ])),
-    redirect: 'https://api.nan.ci/session',
   },
 })).listen(process.env.API_PORT, () => {
   console.info(`server started: http://localhost:${process.env.API_PORT}`)

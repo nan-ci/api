@@ -25,29 +25,39 @@ const DAY = 86400
 const oauth = {
   authorizeUrl: 'https://github.com/login/oauth/authorize',
   accessUrl: 'https://github.com/login/oauth/access_token',
-  setState: res => {
+  params: { redirectTo: String },
+  setState: ({ redirectTo, req }) => {
+    redirectTo || (redirectTo = req.headers.referer)
+    console.log('redirecting to:', redirectTo)
     const key = randomBytes(12)
       .toString('base64')
       .replace(/\+/g, '-')
       .replace(/\//g, '-')
 
-    return db.set(key, '', 'NX', 'EX', DAY)
+    return db.set(key, redirectTo, 'NX', 'EX', DAY)
       .then(success => success ? key : oauth.setState(res))
   },
   handler: ({ access_token: token, scope, token_type, state, error, req }) =>
-    error ? Promise.reject(Error(error)) : getUserInfo(token)
-      .then(user => user.email
-        ? user
-        : (user.email = github.email(token))
-          .then(() => user))
-      .then(user => {
-        Object.assign(user, { token })
-        return Promise.all([
-          db.setex(state, 14 * DAY, user.id),
-          db.setnx(user.id, JSON.stringify(user)),
-        ])
-      })
-      .then(() => state, err => (console.log(err), err)),
+    error
+      ? Promise.reject(Error(error))
+      : getUserInfo(token)
+        .then(async user => {
+          const [ email, url ] = await Promise.all([
+            user.email || github.email(token),
+            db.get(state),
+          ])
+
+          user.token = token
+          user.email = email
+
+          await Promise.all([
+            db.setex(state, 14 * DAY, user.id),
+            db.setnx(user.id, JSON.stringify(user)),
+          ])
+
+          return { state, url }
+        })
+        .catch(err => (console.log(err), err)),
   opts: {
     client_id: process.env.GITHUB_CLIENT_ID,
     client_secret: process.env.GITHUB_CLIENT_SECRET,
