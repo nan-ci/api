@@ -1,6 +1,7 @@
 const { use, t, post } = require('4k/request')
 const { randomBytes } = require('crypto')
 const { c, to } = require('4k')
+const { optional } = require('4k/route-helper')
 const api = require('4k/api')
 const db = require('../redis')
 
@@ -25,10 +26,9 @@ const DAY = 86400
 const oauth = {
   authorizeUrl: 'https://github.com/login/oauth/authorize',
   accessUrl: 'https://github.com/login/oauth/access_token',
-  params: { redirectTo: String },
+  params: { redirectTo: optional(String) },
   setState: ({ redirectTo, req }) => {
     redirectTo || (redirectTo = req.headers.referer)
-    console.log('redirecting to:', redirectTo)
     const key = randomBytes(12)
       .toString('base64')
       .replace(/\+/g, '-')
