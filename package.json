@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "4k": "0.0.7",
+    "4k": "0.0.8",
     "body": "^5.1.0",
     "lodash": "^4.17.4",
     "mailgun-js": "^0.13.1",
