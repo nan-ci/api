@@ -34,7 +34,7 @@ const oauth = {
       .replace(/\+/g, '-')
       .replace(/\//g, '-')
 
-    return db.set(key, redirectTo, 'NX', 'EX', DAY)
+    return db.set(`sessions:${key}`, redirectTo, 'NX', 'EX', DAY)
       .then(success => success ? key : oauth.setState(res))
   },
   handler: ({ access_token: token, scope, token_type, state, error, req }) =>
@@ -44,15 +44,15 @@ const oauth = {
         .then(async user => {
           const [ email, url ] = await Promise.all([
             user.email || github.email(token),
-            db.get(state),
+            db.get(`sessions:${state}`),
           ])
 
           user.token = token
           user.email = email
 
           await Promise.all([
-            db.setex(state, 14 * DAY, user.id),
-            db.setnx(user.id, JSON.stringify(user)),
+            db.setex(`sessions:${state}`, 14 * DAY, user.id),
+            db.hsetnx('users', user.id, JSON.stringify(user)),
           ])
 
           return { state, url }

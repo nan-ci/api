@@ -28,7 +28,12 @@ const server = createServer(server4k({
   allowOrigin: `https://${process.env.DOMAIN}`,
   session: {
     options: { domain: `api.${process.env.DOMAIN}`, path: '/' },
-    get: required(c([ db.get, db.get, JSON.parse ])),
+    get: required(c([
+      key => `sessions:${key}`,
+      db.get,
+      user => db.hget('users', user),
+      JSON.parse,
+    ])),
   },
 })).listen(process.env.API_PORT, () => {
   console.info(`server started: http://localhost:${process.env.API_PORT}`)
